@@ -26,6 +26,15 @@ export async function POST(request: Request) {
     });
   }
 
+  // Ensure Prisma client is available
+  if (!prisma) {
+    console.error("Prisma client is not initialized");
+    return Response.json({
+      success: false,
+      message: "Database connection error",
+    });
+  }
+
   if (!useResumeFallback && (!transcript || transcript.length === 0 || !job)) {
     return Response.json({
       success: false,
@@ -34,9 +43,12 @@ export async function POST(request: Request) {
   }
 
   try {
+    console.log("Checking database connection...");
     const user = await prisma.user.findUnique({
       where: { id: userId },
     });
+
+    console.log("User found:", !!user);
 
     if (!user) {
       return Response.json({

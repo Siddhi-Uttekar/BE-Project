@@ -1,22 +1,24 @@
 import { PrismaClient } from "@prisma/client";
 
-const globalForPrisma = globalThis as unknown as {
-  prisma: PrismaClient | undefined;
-};
-
-if (!process.env.DATABASE_URL) {
-  console.error("DATABASE_URL environment variable is not set");
+declare global {
+  // allow global `var` declarations
+  // eslint-disable-next-line no-var
+  var prisma: PrismaClient | undefined;
 }
 
-export const prisma =
-  globalForPrisma.prisma ||
-  new PrismaClient({
-    log:
-      process.env.NODE_ENV === "development"
-        ? ["query", "error", "warn"]
-        : ["error"],
-  });
+let prisma: PrismaClient;
 
-if (process.env.NODE_ENV !== "production") {
-  globalForPrisma.prisma = prisma;
+if (typeof window === "undefined") {
+  if (process.env.NODE_ENV === "production") {
+    prisma = new PrismaClient();
+  } else {
+    if (!global.prisma) {
+      global.prisma = new PrismaClient({
+        log: ["query", "error", "warn"],
+      });
+    }
+    prisma = global.prisma;
+  }
 }
+
+export { prisma };
