@@ -332,7 +332,7 @@ const InterviewPageContent = () => {
       message: "Reva is getting ready to take your interview..",
     });
 
-    const VAPI_ASSISTANT_ID = process.env.NEXT_PUBLIC_VAPI_ASSISTANT_ID;
+    const VAPI_ASSISTANT_ID = process.env.VAPI_ASSISTANT_ID;
 
     if (!VAPI_ASSISTANT_ID) {
       toast.error(

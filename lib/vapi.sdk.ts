@@ -20,4 +20,4 @@ if (typeof window !== "undefined") {
 	};
 }
 
-export const vapi = new Vapi(process.env.NEXT_PUBLIC_VAPI_PUBLIC_KEY!);
+export const vapi = new Vapi(process.env.VAPI_PUBLIC_KEY!);

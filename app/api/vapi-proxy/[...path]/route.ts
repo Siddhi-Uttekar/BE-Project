@@ -29,10 +29,10 @@ export async function POST(
   };
 
   // Use public API key with Authorization: Bearer header for call/web endpoint
-  if (process.env.NEXT_PUBLIC_VAPI_PUBLIC_KEY) {
-    headers["Authorization"] = `Bearer ${process.env.NEXT_PUBLIC_VAPI_PUBLIC_KEY}`;
+  if (process.env.VAPI_PUBLIC_KEY) {
+    headers["Authorization"] = `Bearer ${process.env.VAPI_PUBLIC_KEY}`;
   }
-  
+
   console.log("[VAPI Proxy] Key exists:", !!process.env.VAPI_API_KEY);
   console.log("[VAPI Proxy] Sending request to:", url);
 
@@ -45,7 +45,7 @@ export async function POST(
 
     const text = await res.text();
     const contentType = res.headers.get("content-type") || "application/json";
-    
+
     if (res.status !== 200) {
       console.log("[VAPI Proxy] Error:", res.status, text);
     }
@@ -71,8 +71,8 @@ export async function GET(
   const url = `https://api.vapi.ai/${finalPath}`;
 
   const headers: Record<string, string> = {};
-  if (process.env.NEXT_PUBLIC_VAPI_PUBLIC_KEY) {
-    headers["Authorization"] = `Bearer ${process.env.NEXT_PUBLIC_VAPI_PUBLIC_KEY}`;
+  if (process.env.VAPI_PUBLIC_KEY) {
+    headers["Authorization"] = `Bearer ${process.env.VAPI_PUBLIC_KEY}`;
   }
 
   try {
