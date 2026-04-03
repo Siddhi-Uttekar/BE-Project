@@ -9,11 +9,12 @@ export async function POST(request: NextRequest) {
     const protocol = request.headers.get("x-forwarded-proto") || "https";
     const requestUrl = host ? `${protocol}://${host}` : null;
 
-    const BASE_URL =
-      process.env.NEXT_PUBLIC_BASE_URL ||
-      process.env.NEXTAUTH_URL ||
-      requestUrl ||
-      "http://localhost:3000";
+   const BASE_URL = (
+  process.env.NEXT_PUBLIC_BASE_URL ||
+  process.env.NEXTAUTH_URL ||
+  requestUrl ||
+  "http://localhost:3000"
+).replace(/\/$/, ""); // ✅ removes trailing slash
 
     if (!GOOGLE_CLIENT_ID) {
       console.error("Missing GOOGLE_CLIENT_ID environment variable");

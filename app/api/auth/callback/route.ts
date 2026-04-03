@@ -60,11 +60,12 @@ export async function GET(request: NextRequest) {
     const protocol = request.headers.get("x-forwarded-proto") || "https";
     const requestUrl = host ? `${protocol}://${host}` : null;
 
-    const BASE_URL =
-      process.env.NEXT_PUBLIC_BASE_URL ||
-      process.env.NEXTAUTH_URL ||
-      requestUrl ||
-      "http://localhost:3000";
+  const BASE_URL = (
+  process.env.NEXT_PUBLIC_BASE_URL ||
+  process.env.NEXTAUTH_URL ||
+  requestUrl ||
+  "http://localhost:3000"
+).replace(/\/$/, ""); // ✅ removes trailing slash
 
     if (!GOOGLE_CLIENT_ID || !GOOGLE_CLIENT_SECRET) {
       console.error("Missing Google OAuth credentials");
