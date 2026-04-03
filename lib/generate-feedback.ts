@@ -384,15 +384,13 @@ If no answer is found, return:
   async callLLM(prompt: string): Promise<any> {
     let text = "";
     try {
-      const model = client.getGenerativeModel({
-        model: "gemini-2.5-flash",
-        generationConfig: {
-          maxOutputTokens: 8192, // Increase max tokens to prevent truncation
-          temperature: 0.7,
-        },
+      const chatCompletion = await client.chat.completions.create({
+        messages: [{ role: "user", content: prompt }],
+        model: "llama-3.3-70b-versatile",
+        temperature: 0.7,
+        max_tokens: 8192,
       });
-      const result = await model.generateContent(prompt);
-      text = result.response.text();
+      text = chatCompletion.choices[0]?.message?.content || "";
 
       // Remove markdown code blocks if present
       text = text
@@ -450,7 +448,7 @@ If no answer is found, return:
       const parsedFeedback = JSON.parse(text || "{}");
       return parsedFeedback;
     } catch (error) {
-      console.error("Got error while talking to Gemini LLM", error);
+      console.error("Got error while talking to Groq LLM", error);
       console.error("Failed to parse text:", text?.substring(0, 500));
       console.error("Text length:", text?.length);
       throw error;

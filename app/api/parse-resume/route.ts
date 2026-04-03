@@ -1,14 +1,16 @@
 import { NextRequest, NextResponse } from "next/server";
 import PDFParser from "pdf2json";
-import { GoogleGenerativeAI } from "@google/generative-ai";
+import Groq from "groq-sdk";
 
-const GEMINI_API_KEY = process.env.GEMINI_API_KEY;
+const GROQ_API_KEY = process.env.GROQ_API_KEY;
 
-if (!GEMINI_API_KEY) {
-  throw new Error("GEMINI_API_KEY is not defined");
+if (!GROQ_API_KEY) {
+  throw new Error("GROQ_API_KEY is not defined");
 }
 
-const ai = new GoogleGenerativeAI(GEMINI_API_KEY);
+const ai = new Groq({
+  apiKey: GROQ_API_KEY,
+});
 
 export async function POST(req: NextRequest) {
   try {
@@ -33,8 +35,8 @@ export async function POST(req: NextRequest) {
       pdfParser.on("pdfParser_dataReady", async () => {
         try {
           const text = (pdfParser as any).getRawTextContent();
-          const model = ai.getGenerativeModel({ model: "gemini-2.0-flash" });
-          const prompt = `
+          const chatCompletion = await ai.chat.completions.create({
+            messages: [{ role: "user", content: `
       Extract the following information from the resume text:
       - name
       - email
@@ -49,10 +51,13 @@ export async function POST(req: NextRequest) {
 
       Resume text:
       ${text}
-      `;
+      ` }],
+            model: "llama-3.3-70b-versatile",
+            temperature: 0.3,
+            max_tokens: 2048,
+          });
 
-          const result = await model.generateContent(prompt);
-          const responseText = result?.response?.text() || "";
+          const responseText = chatCompletion.choices[0]?.message?.content || "";
 
           let parsedData = {};
           const match = responseText.match(
@@ -64,7 +69,7 @@ export async function POST(req: NextRequest) {
           }
           resolve(NextResponse.json(parsedData));
         } catch (error) {
-          console.error("Error generating content from Gemini:", error);
+          console.error("Error generating content from Groq:", error);
           resolve(
             NextResponse.json(
               { error: "Failed to extract information from resume" },

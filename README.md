@@ -14,9 +14,9 @@
 
 ### 🤖 AI-Powered Intelligence
 
-- **Resume Parsing**: Advanced PDF parsing with Google Gemini AI to extract skills, experience, and qualifications
-- **Smart Question Generation**: Context-aware interview questions generated using Google Gemini 2.5-pro
-- **Comprehensive Feedback**: Detailed performance analysis and recommendations using Google Gemini 2.5-flash
+- **Resume Parsing**: Advanced PDF parsing with Groq AI to extract skills, experience, and qualifications
+- **Smart Question Generation**: Context-aware interview questions generated using Groq Llama 3.3 70B
+- **Comprehensive Feedback**: Detailed performance analysis and recommendations using Groq Llama 3.3 70B
 
 ### � Interview Management
 
@@ -55,9 +55,8 @@
 
 ### AI & Voice
 
-- **AI Provider**: Google Generative AI (@google/generative-ai)
-  - Gemini 2.5-pro for resume parsing and question generation
-  - Gemini 2.5-flash for feedback generation
+- **AI Provider**: Groq AI (groq-sdk)
+  - Llama 3.3 70B Versatile for resume parsing, question generation, and feedback
 - **Voice AI**: VAPI AI (@vapi-ai/web 2.3.0) for voice interview sessions
 - **PDF Processing**: pdf2json 3.2.2 for resume parsing
 
@@ -117,7 +116,7 @@ mockhire-final/
 
 - Node.js 20+
 - PostgreSQL database
-- Google Gemini API key
+- Groq API key
 - VAPI AI account
 - ImageKit account
 
@@ -144,7 +143,7 @@ mockhire-final/
    ```env
    DATABASE_URL="postgresql://..."
    JWT_SECRET="your-jwt-secret"
-   GEMINI_API_KEY="your-gemini-api-key"
+   GROQ_API_KEY="your-groq-api-key"
    VAPI_PUBLIC_KEY="your-vapi-public-key"
    VAPI_PRIVATE_KEY="your-vapi-private-key"
    NEXT_PUBLIC_IMAGEKIT_PUBLIC_KEY="your-imagekit-public-key"

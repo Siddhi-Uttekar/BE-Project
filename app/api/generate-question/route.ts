@@ -1,12 +1,14 @@
-import { GoogleGenerativeAI } from "@google/generative-ai";
+import Groq from "groq-sdk";
 
-const GEMINI_API_KEY = process.env.GEMINI_API_KEY;
+const GROQ_API_KEY = process.env.GROQ_API_KEY;
 
-if (!GEMINI_API_KEY) {
-  throw new Error("GEMINI_API_KEY is not defined");
+if (!GROQ_API_KEY) {
+  throw new Error("GROQ_API_KEY is not defined");
 }
 
-const ai = new GoogleGenerativeAI(GEMINI_API_KEY);
+const ai = new Groq({
+  apiKey: GROQ_API_KEY,
+});
 
 export async function POST(request: Request) {
   const {
@@ -97,10 +99,14 @@ export async function POST(request: Request) {
   }
 
   try {
-    const model = ai.getGenerativeModel({ model: "models/gemini-flash-latest" });
-    const result = await model.generateContent(prompt);
+    const chatCompletion = await ai.chat.completions.create({
+      messages: [{ role: "user", content: prompt }],
+      model: "llama-3.3-70b-versatile",
+      temperature: 0.7,
+      max_tokens: 2048,
+    });
 
-    const text = result?.response?.text() || "";
+    const text = chatCompletion.choices[0]?.message?.content || "";
     let questions: string[] = [];
     try {
       const match = text.match(/\`\`\`json([\s\S]*?)\`\`\`|\s*(\[[\s\S]*\])/);
@@ -109,7 +115,7 @@ export async function POST(request: Request) {
         questions = JSON.parse(jsonString);
       }
     } catch (err) {
-      console.error("Error parsing questions from Gemini response:", err);
+      console.error("Error parsing questions from Groq response:", err);
     }
 
     return Response.json(
