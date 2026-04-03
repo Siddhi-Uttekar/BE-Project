@@ -229,3 +229,70 @@ export class AuthService {
     });
   }
 }
+
+// Session helpers (same semantics as lib/session.ts)
+import { cookies, headers } from "next/headers";
+
+export interface SessionUser {
+  id: string;
+  uid: string;
+  email: string;
+  name: string;
+  role: "CANDIDATE" | "RECRUITER";
+  displayName?: string | null;
+  firstName?: string | null;
+  lastName?: string | null;
+}
+
+function parseAccessTokenFromCookieHeader(cookieHeader?: string | null): string | null {
+  if (!cookieHeader) return null;
+  const cookiesArr = cookieHeader.split(";").map((c) => c.trim());
+  for (const c of cookiesArr) {
+    const [k, v] = c.split("=");
+    if (k === "accessToken") return decodeURIComponent(v || "");
+  }
+  return null;
+}
+
+export async function getCurrentUser(): Promise<SessionUser | null> {
+  try {
+    const cookieStore = await cookies();
+    let token = cookieStore.get("accessToken")?.value;
+
+    if (!token) {
+      const headerStore = await headers();
+      const authHeader = headerStore.get("authorization");
+      if (authHeader?.startsWith("Bearer ")) {
+        token = authHeader.substring(7);
+      }
+    }
+
+    if (!token) {
+      return null;
+    }
+
+    const payload = AuthService.verifyToken(token);
+    if (!payload || payload.type !== "access") {
+      return null;
+    }
+
+    const user = await prisma.user.findUnique({
+      where: { id: payload.userId },
+      select: {
+        id: true,
+        uid: true,
+        email: true,
+        name: true,
+        role: true,
+        displayName: true,
+        firstName: true,
+        lastName: true,
+      },
+    });
+
+    return user;
+  } catch (error) {
+    console.error("Error getting current user:", error);
+    return null;
+  }
+}
